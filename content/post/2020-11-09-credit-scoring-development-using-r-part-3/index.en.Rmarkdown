@@ -1,0 +1,165 @@
+---
+title: Credit Scoring Development Using R - Part 3
+author: Ng Yong Kad
+date: '2020-11-09'
+slug: []
+categories:
+  - model-development
+tags:
+  - R
+  - credit-scoring
+  - logistic-regression
+lastmod: '2020-11-09T08:48:31+08:00'
+keywords: []
+description: ''
+comment: no
+toc: TRUE
+autoCollapseToc: TRUE
+postMetaInFooter: no
+hiddenFromHomePage: no
+contentCopyright: no
+reward: no
+mathjax: no
+mathjaxEnableSingleDollar: no
+mathjaxEnableAutoNumber: no
+hideHeaderAndFooter: no
+flowchartDiagrams:
+  enable: no
+  options: ''
+sequenceDiagrams:
+  enable: no
+  options: ''
+---
+
+
+This is the final part of a 3-parts series. 
+
+
+## 6.0 Regression Analysis
+
+
+The ground is now set for developing a credit scorecard.  The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.  
+
+Each type of method has its own pros and cons and this will not be discussed here.  Regardless of which type of method is used, it should be viewed as a tool that allows an analyst to keep the task more manageable. Significant amount of manual adjustments and judgments are still needed to be made in order to arrive at the final credit scorecard.  
+
+The codes below perform stepwise logistic regression analysis.  The stepwise method produces a logistic regression with 6 variables (*max_util_l6m* is excluded). All 6 variables are significant at the 5% level and all coefficients are positive. To keep things simple, the resulting logistic regression is taken as final.       
+
+```{r include = FALSE}
+## this chunk is needed so that all the codes here can run. 
+
+library(tidyverse)
+library(scorecard)
+
+dev <- read_csv("C:/Users/ngyon/Desktop/Workbench/Blogdown/dev.csv") 
+oot <- read_csv("C:/Users/ngyon/Desktop/Workbench/Blogdown/oot.csv")
+dev_woe <- read_csv("C:/Users/ngyon/Desktop/Workbench/Blogdown/dev_woe.csv") 
+```
+
+
+```{r}
+# logistic regression
+logistic <- glm(I(gb_flag == 0) ~ .,  # set the event as good, e.g. gb_flag==0
+                family = binomial(),  # binomial is logistic regression
+                data = dev_woe %>% select(-id)) # remove id column 
+                                                                
+# invoke stepwise regression based on AIC 
+logistic_step <- step(logistic, direction = "both", trace = FALSE)
+
+# print output
+summary(logistic_step) 
+```
+
+The output from the VIF analysis does not suggests any multi-collinearity issue. 
+
+```{r}
+# generate VIF 
+vif(logistic_step, merge_coef = TRUE)
+```
+
+
+## 7.0 Scorecard Creation, Scaling, and Validation
+
+
+Lastly, with the regression obtained, a credit scorecard can be created and validation exercise can be conducted.
+
+The scaling used in this post is: 
+
++ at score of 500, the good bad odd is 100 and; 
++ the point of double odds (PDO) is 30.  Moreover, the base score (i.e. intercept of the regression) is distributed evenly across the 6 variables.  
+
+The package `scorecard` can generate a full-blown report that contains variables statistics, score distribution, scaling information, performance indicators and validation results. 
+
+{{% admonition danger Danger %}}
+In the codes below, PDO has to be set as **-30**. This is because `positive = 0`. And since `positive = 0`, **anything that labeled as good in the report are actually referring to bad, and anything that labeled as bad are actually referring to good. Likewise, bad rate should be interpreted as good rate.**    
+{{% /admonition %}}
+
+
+```{r}
+## scorecard creation
+
+# select the variables in the final regression
+dev_final <- dev %>%
+  select(id, gb_flag, age, avg_deq_l3m, pay_1_recode, pay_4_recode, pay_5_recode, avg_util_l6m)
+
+var_select <- c("age", "avg_deq_l3m", "pay_1_recode", "pay_4_recode", "pay_5_recode", "avg_util_l6m")
+
+breaks_list <- list(age = c("25", "45"), 
+                    avg_deq_l3m = c("0.67",  "2"), 
+                    pay_1_recode = c("1", "2"), 
+                    pay_4_recode = c("1"), 
+                    pay_5_recode = c("2"),
+                    avg_util_l6m = c("0.45", "0.83")
+                    )
+
+bins <- woebin(dev_final, 
+               y = "gb_flag", 
+               x = var_select,
+               positive = 0, 
+               method = "freq", 
+               breaks_list = breaks_list)                                                                                            
+score_card <- scorecard(bins, 
+                       logistic_step, 
+                       points0 = 500, 
+                       pdo = -30, # PDO must set as negative   
+                       odds0 = 100, 
+                       basepoints_eq0 = TRUE)                                                                                   
+# display results
+score_card 
+
+# compute score 
+score <- scorecard_ply(dev_final, score_card, only_total_score = F)
+
+```
+
+The validation report will be saved in the work directory. 
+
+```{r}
+## validation
+
+# select the variables from OOT sample
+oot_final <- oot %>%
+  select(id, gb_flag, age, avg_deq_l3m, pay_1_recode, pay_4_recode, pay_5_recode, avg_util_l6m)
+
+# generate reports
+# good in the report is actually bad, whereas bad is actually good
+report(list(dt1 = dev_final, dt2 = oot_final), 
+       y = "gb_flag", 
+       x = var_select, 
+       breaks_list = breaks_list, 
+       seed = NULL, 
+       basepoints_eq0 = TRUE, 
+       method = "freq", 
+       positive = 0, 
+       points0 = 500, 
+       odds0 = 100,
+       pdo = -30)
+```
+
+
+## 8.0 Conclusion
+
+
+This post shows that a credit scorecard can be developed with ease in R using the package `scorecard`. The caveat is in the data set.  The data set used in this post is small and clean, therefore, does not need a lot of cleaning and manipulations. The number of new variables that can be generated from the data set is also not huge.  
+
+
+ 

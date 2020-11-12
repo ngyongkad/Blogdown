@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>logistic-regression on Ng Yong Kad&#39;s Blog</title>
+    <link>https://ngyongkad.netlify.app/tags/logistic-regression/</link>
+    <description>Recent content in logistic-regression on Ng Yong Kad&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 09 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://ngyongkad.netlify.app/tags/logistic-regression/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Credit Scoring Development Using R - Part 3</title>
+      <link>https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/</link>
+      <pubDate>Mon, 09 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/</guid>
+      <description>This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here.</description>
+    </item>
+    
+  </channel>
+</rss>

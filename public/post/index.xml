@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on Ng Yong Kad&#39;s Blog</title>
+    <link>https://ngyongkad.netlify.app/post/</link>
+    <description>Recent content in Posts on Ng Yong Kad&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 09 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="https://ngyongkad.netlify.app/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Credit Scoring Development Using R - Part 3</title>
+      <link>https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/</link>
+      <pubDate>Mon, 09 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/</guid>
+      <description>This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here.</description>
+    </item>
+    
+    <item>
+      <title>Credit Scoring Development Using R - Part 2</title>
+      <link>https://ngyongkad.netlify.app/post/2020-11-07-credit-scoring-development-using-r-part-2/</link>
+      <pubDate>Sat, 07 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ngyongkad.netlify.app/post/2020-11-07-credit-scoring-development-using-r-part-2/</guid>
+      <description>This is the second part of a 3-parts series.
+4.0 Univariate Analysis 4.1 Fine Classing Fine classing is a technique that groups a variable&amp;rsquo;s values into a number of fine bins. Using these bins, a measure of the variable&amp;rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing. As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard.</description>
+    </item>
+    
+    <item>
+      <title>Credit Scoring Development Using R - Part 1</title>
+      <link>https://ngyongkad.netlify.app/post/2020-11-06-credit-scoring-development-using-r-part-1/</link>
+      <pubDate>Fri, 06 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ngyongkad.netlify.app/post/2020-11-06-credit-scoring-development-using-r-part-1/</guid>
+      <description>This is the first of a 3-parts series.
+This post aims at 2 groups of audience. The first group has learned the underlying theories of credit scorecards but have yet seen a detailed application of the theories. The second group is practitioners who are already well-versed with the theories and the applications, but would like to explore developing credit scorecards using a open-source software such as R.
+1.0 Introduction The methodologies and processes of developing credit scorecards for lending purposes have been a long-held intellectual property of financial institutions and consulting firms.</description>
+    </item>
+    
+    <item>
+      <title>My First Post</title>
+      <link>https://ngyongkad.netlify.app/post/2020-11-05-my-first-post/</link>
+      <pubDate>Thu, 05 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://ngyongkad.netlify.app/post/2020-11-05-my-first-post/</guid>
+      <description>Why putting up a blog?
+Totally by accident, I came across a book written by the developer of blogdown. After spending less than one hour reading the first chapter, it seemed to me that I can put up a blog site fairly quickly. I decided to take up the challenge and the result is this site.
+Note
+In fact, if one has some basic knowledge about RStudio and strictly follows the book&amp;rsquo;s Chapter 1 and the first page of Chapter 3, a bare-bone site can be up and running within 2 to 3 hours.</description>
+    </item>
+    
+  </channel>
+</rss>

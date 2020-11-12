@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Credit Scoring Development Using R - Part 2 - Ng Yong Kad&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Ng Yong Kad" /><meta name="description" content="This is the second part of a 3-parts series.
+4.0 Univariate Analysis 4.1 Fine Classing Fine classing is a technique that groups a variable&amp;rsquo;s values into a number of fine bins. Using these bins, a measure of the variable&amp;rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing. As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard." /><meta name="keywords" content="Hugo, credit-risk, R" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.77.0 with theme even" />
+
+
+<link rel="canonical" href="https://ngyongkad.netlify.app/post/2020-11-07-credit-scoring-development-using-r-part-2/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.c7bc1becf36bcf6a9ebd25d2947e43a2eb745ddb0c9a32b43126fd7fa460c351.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Credit Scoring Development Using R - Part 2" />
+<meta property="og:description" content="This is the second part of a 3-parts series.
+4.0 Univariate Analysis 4.1 Fine Classing Fine classing is a technique that groups a variable&rsquo;s values into a number of fine bins. Using these bins, a measure of the variable&rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing. As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ngyongkad.netlify.app/post/2020-11-07-credit-scoring-development-using-r-part-2/" />
+<meta property="article:published_time" content="2020-11-07T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-07T15:38:40+08:00" />
+<meta itemprop="name" content="Credit Scoring Development Using R - Part 2">
+<meta itemprop="description" content="This is the second part of a 3-parts series.
+4.0 Univariate Analysis 4.1 Fine Classing Fine classing is a technique that groups a variable&rsquo;s values into a number of fine bins. Using these bins, a measure of the variable&rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing. As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard.">
+<meta itemprop="datePublished" content="2020-11-07T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-07T15:38:40+08:00" />
+<meta itemprop="wordCount" content="2025">
+
+
+
+<meta itemprop="keywords" content="R,credit-scoring," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Credit Scoring Development Using R - Part 2"/>
+<meta name="twitter:description" content="This is the second part of a 3-parts series.
+4.0 Univariate Analysis 4.1 Fine Classing Fine classing is a technique that groups a variable&rsquo;s values into a number of fine bins. Using these bins, a measure of the variable&rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing. As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Ng Yong Kad</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Ng Yong Kad</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Credit Scoring Development Using R - Part 2</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-11-07 </span>
+        <div class="post-category">
+            <a href="/categories/model-development/"> model-development </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#40-univariate-analysis">4.0 Univariate Analysis</a>
+          <ul>
+            <li><a href="#41-fine-classing">4.1 Fine Classing</a></li>
+            <li><a href="#42-initial-variables-removal">4.2 Initial Variables Removal</a></li>
+            <li><a href="#42-variables-clustering">4.2 Variables Clustering</a></li>
+            <li><a href="#43-variables-reduction">4.3 Variables Reduction</a></li>
+          </ul>
+        </li>
+        <li><a href="#50-coarse-classing">5.0 Coarse Classing</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>This is the second part of a 3-parts series.</p>
+<h2 id="40-univariate-analysis">4.0 Univariate Analysis</h2>
+<h3 id="41-fine-classing">4.1 Fine Classing</h3>
+<p>Fine classing is a technique that groups a variable&rsquo;s values into a number of fine bins.  Using these bins, a measure of the variable&rsquo;s predictive power, known as information value (IV), can be computed. Also from these fine bins, further grouping can be carried out to result in coarse classing.  As will be shown in the section below, bins from coarse classing are the bins that will be used in a credit scorecard.</p>
+<p>Specifically, the fine classing technique used in this post is called the frequency method in the package <code>scorecard</code>. What this technique entails is grouping a variable&rsquo;s values by having equal percentage of counts in each bin. This is a commonly used technique (see the note below). Following industry practice, the maximum number of fine bins is set at 20.</p>
+<div class="admonition note"><p class="admonition-title">Note</p>
+<ul>
+<li>
+<p>There are other techniques available in the package <code>scorecard</code>.  Interested readers are referred to its<br>
+<a href="https://cran.r-project.org/web/packages/scorecard/index.html">manual</a>.</p>
+</li>
+<li>
+<p>The number of fine bins depends on the distribution of the variable.  Some variables will have concentration in some values.  In such cases, the number of fine bins will turn out to be less than 20.</p>
+</li>
+<li>
+<p>The frequency method in the package <code>scorecard</code> works with <strong>numeric</strong> variables only.  It is therefore necessary to convert or recode character variables (e.g. sex, education etc.) into numeric variables before hand (as the collectors of the data set used here had done).</p>
+</li>
+</ul>
+</div>
+<p>From this point on, the package <code>scorecard</code> will be used.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">scorecard</span><span class="p">)</span>
+
+<span class="c1"># select all the variables for IV computation</span>
+<span class="n">var_list</span> <span class="o">&lt;-</span> <span class="n">dev</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="n">gb_flag</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">names</span><span class="p">()</span>
+
+<span class="c1"># invoke the woebin function in package scorecard</span>
+<span class="n">fine_class</span> <span class="o">&lt;-</span> <span class="nf">woebin</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> 
+                    <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;gb_flag&#34;</span><span class="p">,</span> 
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">var_list</span><span class="p">,</span> 
+                    <span class="n">positive</span> <span class="o">=</span> <span class="m">1</span><span class="p">,</span> <span class="c1"># the value in gb_flag that indicates default</span>
+                    <span class="n">method</span> <span class="o">=</span> <span class="s">&#34;freq&#34;</span><span class="p">,</span> <span class="c1"># frequency method</span>
+                    <span class="n">bin_num_limit</span> <span class="o">=</span> <span class="m">20</span><span class="p">)</span>  <span class="c1"># the max number of fine bins</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] creating woe binning ...
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># collect the IV of the variables</span>
+<span class="n">iv</span> <span class="o">&lt;-</span> <span class="nf">map_df</span><span class="p">(</span><span class="n">fine_class</span><span class="p">,</span> <span class="o">~</span><span class="nf">pluck</span><span class="p">(</span><span class="n">.x</span><span class="p">,</span> <span class="m">10</span><span class="p">,</span> <span class="m">1</span><span class="p">))</span> <span class="o">%&gt;%</span>
+  <span class="nf">pivot_longer</span><span class="p">(</span><span class="nf">everything</span><span class="p">(),</span> <span class="n">names_to</span> <span class="o">=</span> <span class="s">&#34;var&#34;</span><span class="p">,</span> <span class="n">values_to</span> <span class="o">=</span> <span class="s">&#34;iv&#34;</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th style="text-align:left">var</th>
+<th style="text-align:right">iv</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">limit_bal</td>
+<td style="text-align:right">0.1785871</td>
+</tr>
+<tr>
+<td style="text-align:left">sex</td>
+<td style="text-align:right">0.0079849</td>
+</tr>
+<tr>
+<td style="text-align:left">education</td>
+<td style="text-align:right">0.0164957</td>
+</tr>
+<tr>
+<td style="text-align:left">marriage</td>
+<td style="text-align:right">0.0056892</td>
+</tr>
+<tr>
+<td style="text-align:left">age</td>
+<td style="text-align:right">0.0193498</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt1</td>
+<td style="text-align:right">0.0128997</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt2</td>
+<td style="text-align:right">0.0146458</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt3</td>
+<td style="text-align:right">0.0128501</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt4</td>
+<td style="text-align:right">0.0148755</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt5</td>
+<td style="text-align:right">0.0153958</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt6</td>
+<td style="text-align:right">0.0247551</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt1</td>
+<td style="text-align:right">0.1066663</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt2</td>
+<td style="text-align:right">0.0798784</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt3</td>
+<td style="text-align:right">0.0744712</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt4</td>
+<td style="text-align:right">0.0490983</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt5</td>
+<td style="text-align:right">0.0421035</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_amt6</td>
+<td style="text-align:right">0.0199621</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_1_recode</td>
+<td style="text-align:right">0.8648336</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_2_recode</td>
+<td style="text-align:right">0.5459762</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_3_recode</td>
+<td style="text-align:right">0.4117610</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_4_recode</td>
+<td style="text-align:right">0.3616306</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_5_recode</td>
+<td style="text-align:right">0.3354879</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_6_recode</td>
+<td style="text-align:right">0.2923127</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l3m</td>
+<td style="text-align:right">0.8797259</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l6m</td>
+<td style="text-align:right">0.3011544</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l3m</td>
+<td style="text-align:right">0.7979072</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l6m</td>
+<td style="text-align:right">0.7441613</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l3m</td>
+<td style="text-align:right">0.4711887</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l6m</td>
+<td style="text-align:right">0.0000000</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt1_util</td>
+<td style="text-align:right">0.0156583</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt2_util</td>
+<td style="text-align:right">0.0133279</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt3_util</td>
+<td style="text-align:right">0.0128110</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt4_util</td>
+<td style="text-align:right">0.0177728</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt5_util</td>
+<td style="text-align:right">0.0182308</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt6_util</td>
+<td style="text-align:right">0.0209823</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l3m</td>
+<td style="text-align:right">0.1136387</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l6m</td>
+<td style="text-align:right">0.1346854</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l3m</td>
+<td style="text-align:right">0.0899689</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l6m</td>
+<td style="text-align:right">0.1039890</td>
+</tr>
+<tr>
+<td style="text-align:left">min_util_l3m</td>
+<td style="text-align:right">0.0146800</td>
+</tr>
+<tr>
+<td style="text-align:left">min_util_l6m</td>
+<td style="text-align:right">0.0072010</td>
+</tr>
+</tbody>
+</table>
+<p>The reports of the fine classing are contained in <code>fine_class</code> and can be viewed by typing <code>fine_class</code> and running it. Due to the massive amount of reports, only the first one is shown below.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## $limit_bal
+##      variable             bin count count_distr good bad   badprob        woe
+##  1: limit_bal    [-Inf,30000)  1990  0.08291667 1272 718 0.3608040  0.6802441
+##  2: limit_bal   [30000,50000)  1477  0.06154167  936 541 0.3662830  0.7039240
+##  3: limit_bal   [50000,70000)  3358  0.13991667 2466 892 0.2656343  0.2352337
+##  4: limit_bal  [70000,100000)  2369  0.09870833 1774 595 0.2511608  0.1596895
+##  5: limit_bal [100000,140000)  2452  0.10216667 1853 599 0.2442904  0.1228206
+##  6: limit_bal [140000,160000)  1512  0.06300000 1228 284 0.1878307 -0.2120476
+##  7: limit_bal [160000,200000)  1973  0.08220833 1623 350 0.1773948 -0.2819782
+##  8: limit_bal [200000,210000)  1202  0.05008333  987 215 0.1788686 -0.2719118
+##  9: limit_bal [210000,270000)  2725  0.11354167 2259 466 0.1710092 -0.3263717
+## 10: limit_bal [270000,360000)  2258  0.09408333 1941 317 0.1403897 -0.5599366
+## 11: limit_bal [360000,430000)  1448  0.06033333 1235 213 0.1470994 -0.5054139
+## 12: limit_bal   [430000, Inf)  1236  0.05150000 1090 146 0.1181230 -0.7582061
+##          bin_iv  total_iv breaks is_special_values
+##  1: 0.045171693 0.1785871  30000             FALSE
+##  2: 0.036066804 0.1785871  50000             FALSE
+##  3: 0.008242682 0.1785871  70000             FALSE
+##  4: 0.002628082 0.1785871 100000             FALSE
+##  5: 0.001593515 0.1785871 140000             FALSE
+##  6: 0.002665805 0.1785871 160000             FALSE
+##  7: 0.006024928 0.1785871 200000             FALSE
+##  8: 0.003423424 0.1785871 210000             FALSE
+##  9: 0.010999969 0.1785871 270000             FALSE
+## 10: 0.024967126 0.1785871 360000             FALSE
+## 11: 0.013268441 0.1785871 430000             FALSE
+## 12: 0.023534628 0.1785871    Inf             FALSE
+</code></pre></td></tr></table>
+</div>
+</div><div class="admonition note"><p class="admonition-title">Note</p>
+<p>All of the generated fine classing reports can be saved in csv file using the package <code>erer</code> <code>write.list</code> function. Interested reader is encouraged to explore.</p>
+</div>
+<h3 id="42-initial-variables-removal">4.2 Initial Variables Removal</h3>
+<p>As discussed in the section above, new variables are derived because not all raw variables should be used directly. Numeric variables in amount such as balance, limit, payment are not advisable to be used because the variances in their values are large, rendering a credit scorecard unstable. Instead, these variables are converted into ratios (e.g. utilization rates) which are bounded below by zero and the maximum value should not be too far away from 100%.</p>
+<p>Also discussed above is variables with a lot of missing values should be discarded. But this does not apply in this post because all variables have no missing values.</p>
+<p>Lastly, variables with low predictive power as measured by IV are also removed (IV&lt;0.02). However, since <em>age</em>&rsquo;s IV is at the boarder line and it is preferable to have some demographic variables in a credit scorecard, <em>age</em> is kept.</p>
+<p>With the above, the following variables are removed:</p>
+<ol>
+<li>Low IV</li>
+</ol>
+<ul>
+<li>sex</li>
+<li>education</li>
+<li>marriage</li>
+<li>bill_amt1 to bill_amt5</li>
+<li>pay_amt6</li>
+<li>min_deq_l6m</li>
+<li>bill_amt1_util to bill_amt5_util</li>
+<li>min_util_l3m</li>
+<li>min_util_l6m</li>
+</ul>
+<ol start="2">
+<li>Variables in amount</li>
+</ol>
+<ul>
+<li>limit_bal</li>
+<li>pay_amt1 to pay_amt5</li>
+<li>bill_amt6</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># keep the relevant variables</span>
+<span class="n">dev</span> <span class="o">&lt;-</span> <span class="n">dev</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">gb_flag</span><span class="o">:</span><span class="n">max_util_l6m</span><span class="p">,</span> <span class="n">avg_deq_l3m</span><span class="o">:</span><span class="n">min_deq_l3m</span><span class="p">,</span> <span class="n">bill_amt6_util</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><h3 id="42-variables-clustering">4.2 Variables Clustering</h3>
+<p>An analyst frequently faces thousands of variables. Even after filtering out variables with high missing values or with low IV values, hundreds of variables will still remain.</p>
+<p>In addition to the IV and missing values criteria, <em>variables clustering</em> can be added to the variables reduction tool kit. The idea of variables clustering is to group similar variables into one cluster. Then, a few variables can be selected from each of the different clusters. An additional benefit that stems from variables clustering is that it could help reduce multi-collinearity among variables.</p>
+<p>While it is not really applicable in this post as the number of variables is small, variables clustering is conducted for completeness.  From the stability plot shown below, 4 clusters appear appropriate for the development sample.  Hence, 4 cluster is set using <code>cuttree</code>.  In the final output table below, the &ldquo;x&rdquo; column is cluster name.  The application of this output is provided in the section below.</p>
+<div class="admonition note"><p class="admonition-title">Note</p>
+<p>Variables clustering is computation intensive.  It could take up to hours to complete the task if the number of variables is huge.</p>
+</div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">library</span><span class="p">(</span><span class="n">ClustOfVar</span><span class="p">)</span>
+
+<span class="c1"># perform variables clustering</span>
+<span class="n">tree</span> <span class="o">&lt;-</span> <span class="n">dev</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">id</span><span class="p">,</span> <span class="o">-</span><span class="n">gb_flag</span><span class="p">)</span> <span class="o">%&gt;%</span>
+  <span class="nf">hclustvar</span><span class="p">()</span> 
+
+<span class="c1"># stability plot</span>
+<span class="nf">set.seed</span><span class="p">(</span><span class="m">345</span><span class="p">)</span>
+<span class="n">stab</span> <span class="o">&lt;-</span> <span class="nf">stability</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">B</span> <span class="o">=</span> <span class="m">30</span><span class="p">)</span> <span class="c1"># B is bootstrapping sample. set B at 30 to 50 to reduce computing time </span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="nf">boxplot</span><span class="p">(</span><span class="n">stab</span><span class="o">$</span><span class="n">matCR</span><span class="p">,</span> <span class="n">main</span> <span class="o">=</span> <span class="s">&#34;Dispersion of the adjusted Rand index&#34;</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-6-2.png" width="672" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># generate the final cluster output</span>
+<span class="n">clus</span> <span class="o">&lt;-</span> <span class="nf">cutree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="m">4</span><span class="p">)</span> 
+</code></pre></td></tr></table>
+</div>
+</div><table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:right">x</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">age</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_1_recode</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_2_recode</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_3_recode</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_4_recode</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_5_recode</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_6_recode</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l3m</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l6m</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l3m</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l6m</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l3m</td>
+<td style="text-align:right">2</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l6m</td>
+<td style="text-align:right">3</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt1_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt2_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt3_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt4_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt5_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt6_util</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l3m</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l6m</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l3m</td>
+<td style="text-align:right">4</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l6m</td>
+<td style="text-align:right">4</td>
+</tr>
+</tbody>
+</table>
+<h3 id="43-variables-reduction">4.3 Variables Reduction</h3>
+<p>One way to utilize the output from variables clustering is combining it with IV as follows:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">var</th>
+<th style="text-align:right">clus</th>
+<th style="text-align:right">iv</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">age</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">0.0193498</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l3m</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.8797259</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_1_recode</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.8648336</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l3m</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.7979072</td>
+</tr>
+<tr>
+<td style="text-align:left">max_deq_l6m</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.7441613</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_2_recode</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.5459762</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l3m</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.4711887</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_3_recode</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.4117610</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_deq_l6m</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">0.3011544</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_4_recode</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0.3616306</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_5_recode</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0.3354879</td>
+</tr>
+<tr>
+<td style="text-align:left">pay_6_recode</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0.2923127</td>
+</tr>
+<tr>
+<td style="text-align:left">min_deq_l6m</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">0.0000000</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l6m</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.1346854</td>
+</tr>
+<tr>
+<td style="text-align:left">avg_util_l3m</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.1136387</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l6m</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.1039890</td>
+</tr>
+<tr>
+<td style="text-align:left">max_util_l3m</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0899689</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt6_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0209823</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt5_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0182308</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt4_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0177728</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt1_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0156583</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt2_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0133279</td>
+</tr>
+<tr>
+<td style="text-align:left">bill_amt3_util</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">0.0128110</td>
+</tr>
+</tbody>
+</table>
+<p>In cluster 1, there is only one variable. Thus, <em>age</em> is short-listed. In cluster 2, the first 2 variables <em>avg_deq_l3m</em> and <em>pay_1_recode</em> are selected because they have the highest IVs in the cluster. Likewise for cluster 3, <em>pay_4_recode</em> and <em>pay_5_recode</em> are chosen. Finally, in cluster 4, the first 2 variables' IV are quite close and these 2 variables are of average utilization. Therefore, instead of choosing the first 2 variables, the first (<em>avg_util_l6m</em>) and the third (<em>max_util_l6m</em>) are short-listed.</p>
+<div class="admonition note"><p class="admonition-title">Note</p>
+<p>The process presented above is <em><strong>one of many ways</strong></em> of using variables clustering.  Different analysts use variables clustering differently.</p>
+</div>
+<h2 id="50-coarse-classing">5.0 Coarse Classing</h2>
+<p>To do coarse classing, it is necessary to go back to the fine classing reports generated previously, focusing solely on the short-listed variables.</p>
+<p>One can use the fine classing reports directly for coarse classing. In this post, plots are used because they are easier for presentation. The plots are shown below one by one for the short-listed variables.</p>
+<p>The first plot is for <em>age</em>.  Referring to the plot, the bad rates of this variable is of U-shape.  A plausible explanation that can be put forward is younger credit card holders are risky because of their lower income. On the other hand, old credit card holders are also risky because of having multiple loans, in retirement, or incurring heavy medical costs etc. For <em>age</em>, the coarse classing could be: a) &lt;25, b)25 to &lt;45, c) 45 and above. Note that the third bin is not starting from 46 as suggested by the plot. 45 is used just to make the bound nicer.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot</span> <span class="o">&lt;-</span> <span class="nf">woebin_plot</span><span class="p">(</span><span class="n">fine_class_final</span><span class="p">)</span>
+<span class="n">plot[[1]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<p><em>ave_deq_l3m</em> is straight-forward. The bins with 44.1% and 45.1% bad rates are grouped together while others remain unchanged.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[2]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<p>No further classing is necessary for <em>pay_1_recode</em>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[3]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<p>No further classing is necessary for <em>pay_4_recode</em>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[4]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<p>No further classing is necessary for <em>pay_5_recode</em>.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[5]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-14-1.png" width="672" /></p>
+<p>Utilization rates are expected to be monotonic in bad rates. That is, higher utilization rates associate with higher bad rates, or vice versa.  Yet, this expectation is not consistent with what shown in the plot of <em>avg_util_l6m</em>.  In the plot, it is those with lower utilization rates (i.e. first few bins) have higher bad rates.</p>
+<p>For this variable, the coarse classing could be: a) &lt;45%, b) 45% to &lt;83%, and c) 83% and above. Note that minor tweaks are applied to the bounds of the bins. (Refer to the fine class report for the details of the bins.)</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[6]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p>The situation of <em>max_util_l6m</em> is similar to <em>avg_util_l6m</em>. The coarse classing could be: a) &lt;43%, b) 43% to &lt;100%, and c) 100% and above.  Minor tweaks are applied to the bounds of the bins.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">plot[[7]]</span>
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-07-credit-scoring-development-using-r-part-2/index.en_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>The bounds resulted from the coarse classing of all short-listed variables can be saved into a list for future use.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">breaks_list</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;25&#34;</span><span class="p">,</span> <span class="s">&#34;45&#34;</span><span class="p">),</span> 
+                    <span class="n">avg_deq_l3m</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;0.67&#34;</span><span class="p">,</span>  <span class="s">&#34;2&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_1_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">,</span> <span class="s">&#34;2&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_4_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_5_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">),</span>
+                    <span class="n">avg_util_l6m</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;0.45&#34;</span><span class="p">,</span> <span class="s">&#34;0.83&#34;</span><span class="p">),</span>
+                    <span class="n">max_util_l6m</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;0.43&#34;</span><span class="p">,</span> <span class="s">&#34;1.00&#34;</span><span class="p">)</span>
+                    <span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="admonition danger"><p class="admonition-title">Danger</p>
+<p>What is to be done next is important.</p>
+<p>As opposed to other applications, credit scorecards in financial institutions are usually developed to predict &ldquo;good&rdquo; instead of &ldquo;bad&rdquo; (i.e. default).</p>
+<p>The reason of predicting &ldquo;good&rdquo; is because credit scores are used as a risk ranking tool. Credit worthy customers (i.e. good customers) are given high scores.  And this is easy to communicate to non-technical persons.</p>
+<p>Given the afore-mentioned reason, the codes need to be changed slightly.  That is, <code>positive = 1</code> needs to be set as <code>positive = 0</code>.  This will not change the IV values and the WOE values of the bins.  However, the sign of the WOE values will change.  The WOE values with <code>positive = 0</code> are the values that will be used to develop credit scorecards.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># set positive = 0</span>
+<span class="n">coarse_class</span> <span class="o">&lt;-</span> <span class="nf">woebin</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> 
+                       <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;gb_flag&#34;</span><span class="p">,</span> 
+                       <span class="n">x</span> <span class="o">=</span> <span class="n">short_var_list</span><span class="p">,</span> 
+                       <span class="n">positive</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> 
+                       <span class="n">method</span> <span class="o">=</span> <span class="s">&#34;freq&#34;</span><span class="p">,</span> 
+                       <span class="n">breaks_list</span> <span class="o">=</span> <span class="n">breaks_list</span><span class="p">)</span> <span class="c1"># from coarse classing results</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] creating woe binning ...
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># transform variables&#39; values into WOE values</span>
+<span class="n">dev_woe</span> <span class="o">&lt;-</span> <span class="nf">woebin_ply</span><span class="p">(</span><span class="n">dev</span><span class="p">,</span> <span class="n">coarse_class</span><span class="p">)</span>  
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] converting into woe values ...
+</code></pre></td></tr></table>
+</div>
+</div></div>
+
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/r/">R</a>
+          <a href="/tags/credit-scoring/">credit-scoring</a>
+          </div>
+      <nav class="post-nav">
+        <a class="prev" href="/post/2020-11-09-credit-scoring-development-using-r-part-3/">
+            <i class="iconfont icon-left"></i>
+            <span class="prev-text nav-default">Credit Scoring Development Using R - Part 3</span>
+            <span class="prev-text nav-mobile">Prev</span>
+          </a>
+        <a class="next" href="/post/2020-11-06-credit-scoring-development-using-r-part-1/">
+            <span class="next-text nav-default">Credit Scoring Development Using R - Part 1</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:ngyongkad@yahoo.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://twitter.com/" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://www.linkedin.com/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/" class="iconfont icon-github" title="github"></a>
+  <a href="https://ngyongkad.netlify.app/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020<span class="heart"><i class="iconfont icon-heart"></i></span><span>Ng Yong Kad</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

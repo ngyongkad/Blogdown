@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://ngyongkad.netlify.app/sitemap.xml

@@ -1,0 +1,95 @@
+<?xml-stylesheet type="text/xsl" href="https://ngyongkad.netlify.app/sitemap.xsl"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/about/</loc>
+    <lastmod>2020-11-05T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/categories/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/tags/credit-scoring/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/tags/logistic-regression/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/categories/model-development/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/post/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/tags/r/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/tags/</loc>
+    <lastmod>2020-11-09T08:48:31+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/post/2020-11-07-credit-scoring-development-using-r-part-2/</loc>
+    <lastmod>2020-11-07T15:38:40+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/post/2020-11-06-credit-scoring-development-using-r-part-1/</loc>
+    <lastmod>2020-11-06T09:11:35+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+  <url>
+    <loc>https://ngyongkad.netlify.app/post/2020-11-05-my-first-post/</loc>
+    <lastmod>2020-11-05T14:21:28+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  
+</urlset>

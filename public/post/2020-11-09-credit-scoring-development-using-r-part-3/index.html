@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Credit Scoring Development Using R - Part 3 - Ng Yong Kad&#39;s Blog</title>
+  <meta name="renderer" content="webkit" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+<meta name="theme-color" content="#f8f5ec" />
+<meta name="msapplication-navbutton-color" content="#f8f5ec">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#f8f5ec">
+
+
+<meta name="author" content="Ng Yong Kad" /><meta name="description" content="This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here." /><meta name="keywords" content="Hugo, credit-risk, R" />
+
+
+
+
+
+
+<meta name="generator" content="Hugo 0.77.0 with theme even" />
+
+
+<link rel="canonical" href="https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/" />
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/manifest.json">
+<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+
+
+
+<link href="/sass/main.min.c7bc1becf36bcf6a9ebd25d2947e43a2eb745ddb0c9a32b43126fd7fa460c351.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.css" integrity="sha256-7TyXnr2YU040zfSP+rEcz29ggW4j56/ujTPwjMzyqFY=" crossorigin="anonymous">
+
+
+<meta property="og:title" content="Credit Scoring Development Using R - Part 3" />
+<meta property="og:description" content="This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here." />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ngyongkad.netlify.app/post/2020-11-09-credit-scoring-development-using-r-part-3/" />
+<meta property="article:published_time" content="2020-11-09T00:00:00+00:00" />
+<meta property="article:modified_time" content="2020-11-09T08:48:31+08:00" />
+<meta itemprop="name" content="Credit Scoring Development Using R - Part 3">
+<meta itemprop="description" content="This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here.">
+<meta itemprop="datePublished" content="2020-11-09T00:00:00+00:00" />
+<meta itemprop="dateModified" content="2020-11-09T08:48:31+08:00" />
+<meta itemprop="wordCount" content="1740">
+
+
+
+<meta itemprop="keywords" content="R,credit-scoring,logistic-regression," />
+<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Credit Scoring Development Using R - Part 3"/>
+<meta name="twitter:description" content="This is the final part of a 3-parts series.
+6.0 Regression Analysis The ground is now set for developing a credit scorecard. The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.
+Each type of method has its own pros and cons and this will not be discussed here."/>
+
+<!--[if lte IE 9]>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/classlist/1.1.20170427/classList.min.js"></script>
+<![endif]-->
+
+<!--[if lt IE 9]>
+  <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+<![endif]-->
+
+</head>
+<body>
+  <div id="mobile-navbar" class="mobile-navbar">
+  <div class="mobile-header-logo">
+    <a href="/" class="logo">Ng Yong Kad</a>
+  </div>
+  <div class="mobile-navbar-icon">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</div>
+<nav id="mobile-menu" class="mobile-menu slideout-menu">
+  <ul class="mobile-menu-list">
+    <a href="/">
+        <li class="mobile-menu-item">Home</li>
+      </a><a href="/post/">
+        <li class="mobile-menu-item">Archives</li>
+      </a><a href="/tags/">
+        <li class="mobile-menu-item">Tags</li>
+      </a><a href="/categories/">
+        <li class="mobile-menu-item">Categories</li>
+      </a><a href="/about/">
+        <li class="mobile-menu-item">About</li>
+      </a>
+  </ul>
+</nav>
+  <div class="container" id="mobile-panel">
+    <header id="header" class="header">
+        <div class="logo-wrapper">
+  <a href="/" class="logo">Ng Yong Kad</a>
+</div>
+
+<nav class="site-navbar">
+  <ul id="menu" class="menu">
+    <li class="menu-item">
+        <a class="menu-item-link" href="/">Home</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/post/">Archives</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/tags/">Tags</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/categories/">Categories</a>
+      </li><li class="menu-item">
+        <a class="menu-item-link" href="/about/">About</a>
+      </li>
+  </ul>
+</nav>
+    </header>
+
+    <main id="main" class="main">
+      <div class="content-wrapper">
+        <div id="content" class="content">
+          <article class="post">
+    
+    <header class="post-header">
+      <h1 class="post-title">Credit Scoring Development Using R - Part 3</h1>
+
+      <div class="post-meta">
+        <span class="post-time"> 2020-11-09 </span>
+        <div class="post-category">
+            <a href="/categories/model-development/"> model-development </a>
+            </div>
+        
+      </div>
+    </header>
+
+    <div class="post-toc" id="post-toc">
+  <h2 class="post-toc-title">Contents</h2>
+  <div class="post-toc-content">
+    <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#60-regression-analysis">6.0 Regression Analysis</a></li>
+        <li><a href="#70-scorecard-creation-scaling-and-validation">7.0 Scorecard Creation, Scaling, and Validation</a></li>
+        <li><a href="#80-conclusion">8.0 Conclusion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+  </div>
+</div>
+    <div class="post-content">
+      <p>This is the final part of a 3-parts series.</p>
+<h2 id="60-regression-analysis">6.0 Regression Analysis</h2>
+<p>The ground is now set for developing a credit scorecard.  The technique, as widely documented in the literature, is based on logistic regression. To obtain a parsimonious logistic regression, one approach is to use the stepwise method. This method seeks to minimize the AIC by allowing variables to enter or to exit iteratively.</p>
+<p>Each type of method has its own pros and cons and this will not be discussed here.  Regardless of which type of method is used, it should be viewed as a tool that allows an analyst to keep the task more manageable. Significant amount of manual adjustments and judgments are still needed to be made in order to arrive at the final credit scorecard.</p>
+<p>The codes below perform stepwise logistic regression analysis.  The stepwise method produces a logistic regression with 6 variables (<em>max_util_l6m</em> is excluded). All 6 variables are significant at the 5% level and all coefficients are positive. To keep things simple, the resulting logistic regression is taken as final.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># logistic regression</span>
+<span class="n">logistic</span> <span class="o">&lt;-</span> <span class="nf">glm</span><span class="p">(</span><span class="nf">I</span><span class="p">(</span><span class="n">gb_flag</span> <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="o">~</span> <span class="n">.,</span>  <span class="c1"># set the event as good, e.g. gb_flag==0</span>
+                <span class="n">family</span> <span class="o">=</span> <span class="nf">binomial</span><span class="p">(),</span>  <span class="c1"># binomial is logistic regression</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">dev_woe</span> <span class="o">%&gt;%</span> <span class="nf">select</span><span class="p">(</span><span class="o">-</span><span class="n">id</span><span class="p">))</span> <span class="c1"># remove id column </span>
+                                                                
+<span class="c1"># invoke stepwise regression based on AIC </span>
+<span class="n">logistic_step</span> <span class="o">&lt;-</span> <span class="nf">step</span><span class="p">(</span><span class="n">logistic</span><span class="p">,</span> <span class="n">direction</span> <span class="o">=</span> <span class="s">&#34;both&#34;</span><span class="p">,</span> <span class="n">trace</span> <span class="o">=</span> <span class="kc">FALSE</span><span class="p">)</span>
+
+<span class="c1"># print output</span>
+<span class="nf">summary</span><span class="p">(</span><span class="n">logistic_step</span><span class="p">)</span> 
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## 
+## Call:
+## glm(formula = I(gb_flag == 0) ~ pay_2_recode + pay_3_recode + 
+##     pay_6_recode + avg_deq_l6m + max_deq_l6m + min_deq_l3m + 
+##     min_deq_l6m + bill_amt2_util + bill_amt5_util + max_util_l3m + 
+##     age_woe + pay_1_recode_woe + pay_4_recode_woe + pay_5_recode_woe + 
+##     avg_util_l6m_woe, family = binomial(), data = dev_woe %&gt;% 
+##     select(-id))
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.3131   0.4434   0.4973   0.5407   2.0459  
+## 
+## Coefficients:
+##                  Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)       1.03541    0.06094  16.992  &lt; 2e-16 ***
+## pay_2_recode     -0.29873    0.04104  -7.280 3.34e-13 ***
+## pay_3_recode     -0.33725    0.04501  -7.492 6.77e-14 ***
+## pay_6_recode     -0.41495    0.04833  -8.586  &lt; 2e-16 ***
+## avg_deq_l6m       1.37781    0.18145   7.593 3.11e-14 ***
+## max_deq_l6m      -0.23049    0.03691  -6.245 4.23e-10 ***
+## min_deq_l3m       0.12436    0.06516   1.908   0.0563 .  
+## min_deq_l6m       0.12222    0.07234   1.689   0.0911 .  
+## bill_amt2_util   -0.34741    0.16290  -2.133   0.0330 *  
+## bill_amt5_util    0.61995    0.10781   5.751 8.89e-09 ***
+## max_util_l3m      0.36507    0.14629   2.495   0.0126 *  
+## age_woe           0.62331    0.14728   4.232 2.31e-05 ***
+## pay_1_recode_woe  0.89252    0.03171  28.146  &lt; 2e-16 ***
+## pay_4_recode_woe  0.42746    0.05038   8.484  &lt; 2e-16 ***
+## pay_5_recode_woe  0.44321    0.05262   8.423  &lt; 2e-16 ***
+## avg_util_l6m_woe  0.83584    0.14955   5.589 2.28e-08 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 25433  on 23999  degrees of freedom
+## Residual deviance: 21175  on 23984  degrees of freedom
+## AIC: 21207
+## 
+## Number of Fisher Scoring iterations: 4
+</code></pre></td></tr></table>
+</div>
+</div><p>The output from the VIF analysis does not suggests any multi-collinearity issue.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># generate VIF </span>
+<span class="nf">vif</span><span class="p">(</span><span class="n">logistic_step</span><span class="p">,</span> <span class="n">merge_coef</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">##             variable   Estimate Std. Error z value Pr(&gt;|z|)      gvif
+##  1:      (Intercept)  1.0354118     0.0609 16.9918   0.0000        NA
+##  2:     pay_2_recode -0.2987315     0.0410 -7.2799   0.0000  5.052485
+##  3:     pay_3_recode -0.3372513     0.0450 -7.4923   0.0000  5.744389
+##  4:     pay_6_recode -0.4149456     0.0483 -8.5855   0.0000  5.477218
+##  5:      avg_deq_l6m  1.3778062     0.1814  7.5935   0.0000 52.220875
+##  6:      max_deq_l6m -0.2304948     0.0369 -6.2452   0.0000  6.205415
+##  7:      min_deq_l3m  0.1243624     0.0652  1.9085   0.0563  5.841826
+##  8:      min_deq_l6m  0.1222177     0.0723  1.6894   0.0911  3.302808
+##  9:   bill_amt2_util -0.3474052     0.1629 -2.1326   0.0330 14.702017
+## 10:   bill_amt5_util  0.6199534     0.1078  5.7506   0.0000  4.938752
+## 11:     max_util_l3m  0.3650659     0.1463  2.4954   0.0126 12.842162
+## 12:          age_woe  0.6233068     0.1473  4.2321   0.0000  1.015499
+## 13: pay_1_recode_woe  0.8925226     0.0317 28.1461   0.0000  3.232373
+## 14: pay_4_recode_woe  0.4274605     0.0504  8.4841   0.0000  3.394157
+## 15: pay_5_recode_woe  0.4432148     0.0526  8.4231   0.0000  3.429983
+## 16: avg_util_l6m_woe  0.8358393     0.1495  5.5891   0.0000  6.765641
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="70-scorecard-creation-scaling-and-validation">7.0 Scorecard Creation, Scaling, and Validation</h2>
+<p>Lastly, with the regression obtained, a credit scorecard can be created and validation exercise can be conducted.</p>
+<p>The scaling used in this post is:</p>
+<ul>
+<li>at score of 500, the good bad odd is 100 and;</li>
+<li>the point of double odds (PDO) is 30.  Moreover, the base score (i.e. intercept of the regression) is distributed evenly across the 6 variables.</li>
+</ul>
+<p>The package <code>scorecard</code> can generate a full-blown report that contains variables statistics, score distribution, scaling information, performance indicators and validation results.</p>
+<div class="admonition danger"><p class="admonition-title">Danger</p>
+<p>In the codes below, PDO has to be set as <strong>-30</strong>. This is because <code>positive = 0</code>. And since <code>positive = 0</code>, <strong>anything that labeled as good in the report are actually referring to bad, and anything that labeled as bad are actually referring to good. Likewise, bad rate should be interpreted as good rate.</strong></p>
+</div>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">## scorecard creation</span>
+
+<span class="c1"># select the variables in the final regression</span>
+<span class="n">dev_final</span> <span class="o">&lt;-</span> <span class="n">dev</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">gb_flag</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">avg_deq_l3m</span><span class="p">,</span> <span class="n">pay_1_recode</span><span class="p">,</span> <span class="n">pay_4_recode</span><span class="p">,</span> <span class="n">pay_5_recode</span><span class="p">,</span> <span class="n">avg_util_l6m</span><span class="p">)</span>
+
+<span class="n">var_select</span> <span class="o">&lt;-</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;age&#34;</span><span class="p">,</span> <span class="s">&#34;avg_deq_l3m&#34;</span><span class="p">,</span> <span class="s">&#34;pay_1_recode&#34;</span><span class="p">,</span> <span class="s">&#34;pay_4_recode&#34;</span><span class="p">,</span> <span class="s">&#34;pay_5_recode&#34;</span><span class="p">,</span> <span class="s">&#34;avg_util_l6m&#34;</span><span class="p">)</span>
+
+<span class="n">breaks_list</span> <span class="o">&lt;-</span> <span class="nf">list</span><span class="p">(</span><span class="n">age</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;25&#34;</span><span class="p">,</span> <span class="s">&#34;45&#34;</span><span class="p">),</span> 
+                    <span class="n">avg_deq_l3m</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;0.67&#34;</span><span class="p">,</span>  <span class="s">&#34;2&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_1_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">,</span> <span class="s">&#34;2&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_4_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;1&#34;</span><span class="p">),</span> 
+                    <span class="n">pay_5_recode</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;2&#34;</span><span class="p">),</span>
+                    <span class="n">avg_util_l6m</span> <span class="o">=</span> <span class="nf">c</span><span class="p">(</span><span class="s">&#34;0.45&#34;</span><span class="p">,</span> <span class="s">&#34;0.83&#34;</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+<span class="n">bins</span> <span class="o">&lt;-</span> <span class="nf">woebin</span><span class="p">(</span><span class="n">dev_final</span><span class="p">,</span> 
+               <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;gb_flag&#34;</span><span class="p">,</span> 
+               <span class="n">x</span> <span class="o">=</span> <span class="n">var_select</span><span class="p">,</span>
+               <span class="n">positive</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> 
+               <span class="n">method</span> <span class="o">=</span> <span class="s">&#34;freq&#34;</span><span class="p">,</span> 
+               <span class="n">breaks_list</span> <span class="o">=</span> <span class="n">breaks_list</span><span class="p">)</span>                                                                                            
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] creating woe binning ...
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="n">score_card</span> <span class="o">&lt;-</span> <span class="nf">scorecard</span><span class="p">(</span><span class="n">bins</span><span class="p">,</span> 
+                       <span class="n">logistic_step</span><span class="p">,</span> 
+                       <span class="n">points0</span> <span class="o">=</span> <span class="m">500</span><span class="p">,</span> 
+                       <span class="n">pdo</span> <span class="o">=</span> <span class="m">-30</span><span class="p">,</span> <span class="c1"># PDO must set as negative   </span>
+                       <span class="n">odds0</span> <span class="o">=</span> <span class="m">100</span><span class="p">,</span> 
+                       <span class="n">basepoints_eq0</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">)</span>                                                                                   
+<span class="c1"># display results</span>
+<span class="n">score_card</span> 
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## $basepoints
+##      variable bin woe points
+## 1: basepoints  NA  NA      0
+## 
+## $pay_2_recode
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $pay_3_recode
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $pay_6_recode
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $avg_deq_l6m
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $max_deq_l6m
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $min_deq_l3m
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $min_deq_l6m
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $bill_amt2_util
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $bill_amt5_util
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $max_util_l3m
+## Empty data.table (0 rows and 13 cols): variable,bin,count,count_distr,good,bad...
+## 
+## $age
+##    variable       bin count count_distr good   bad   badprob         woe
+## 1:      age [-Inf,25)  2168  0.09033333  588  1580 0.7287823 -0.26366705
+## 2:      age   [25,45) 17639  0.73495833 3711 13928 0.7896139  0.07047959
+## 3:      age [45, Inf)  4193  0.17470833 1037  3156 0.7526830 -0.13914675
+##         bin_iv   total_iv breaks is_special_values points
+## 1: 0.006734044 0.01382605     25             FALSE     16
+## 2: 0.003579285 0.01382605     45             FALSE     25
+## 3: 0.003512724 0.01382605    Inf             FALSE     19
+## 
+## $pay_1_recode
+##        variable      bin count count_distr good   bad   badprob        woe
+## 1: pay_1_recode [-Inf,1) 18504    0.771000 2567 15937 0.8612732  0.5737853
+## 2: pay_1_recode    [1,2)  2943    0.122625  995  1948 0.6619096 -0.5803045
+## 3: pay_1_recode [2, Inf)  2553    0.106375 1774   779 0.3051312 -2.0751013
+##        bin_iv  total_iv breaks is_special_values points
+## 1: 0.21391743 0.8648336      1             FALSE     45
+## 2: 0.04764138 0.8648336      2             FALSE      1
+## 3: 0.60327484 0.8648336    Inf             FALSE    -57
+## 
+## $pay_4_recode
+##        variable      bin count count_distr good   bad   badprob        woe
+## 1: pay_4_recode [-Inf,1) 21158   0.8815833 3806 17352 0.8201153  0.2650088
+## 2: pay_4_recode [1, Inf)  2842   0.1184167 1530  1312 0.4616467 -1.4058353
+##        bin_iv  total_iv breaks is_special_values points
+## 1: 0.05735741 0.3616306      1             FALSE     28
+## 2: 0.30427319 0.3616306    Inf             FALSE     -3
+## 
+## $pay_5_recode
+##        variable      bin count count_distr good   bad   badprob        woe
+## 1: pay_5_recode [-Inf,2) 21595   0.8997917 3992 17603 0.8151424  0.2316568
+## 2: pay_5_recode [2, Inf)  2405   0.1002083 1344  1061 0.4411642 -1.4885586
+##        bin_iv  total_iv breaks is_special_values points
+## 1: 0.04517924 0.3354879      2             FALSE     27
+## 2: 0.29030861 0.3354879    Inf             FALSE     -6
+## 
+## $avg_util_l6m
+##        variable         bin count count_distr good   bad   badprob        woe
+## 1: avg_util_l6m [-Inf,0.45) 14337   0.5973750 2621 11716 0.8171863  0.2452793
+## 2: avg_util_l6m [0.45,0.83)  6103   0.2542917 1546  4557 0.7466820 -0.1711267
+## 3: avg_util_l6m [0.83, Inf)  3560   0.1483333 1169  2391 0.6716292 -0.5365572
+##         bin_iv   total_iv breaks is_special_values points
+## 1: 0.033490587 0.09009968   0.45             FALSE     32
+## 2: 0.007798286 0.09009968   0.83             FALSE     17
+## 3: 0.048810811 0.09009968    Inf             FALSE      4
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1"># compute score </span>
+<span class="n">score</span> <span class="o">&lt;-</span> <span class="nf">scorecard_ply</span><span class="p">(</span><span class="n">dev_final</span><span class="p">,</span> <span class="n">score_card</span><span class="p">,</span> <span class="n">only_total_score</span> <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><p>The validation report will be saved in the work directory.</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-r" data-lang="r"><span class="c1">## validation</span>
+
+<span class="c1"># select the variables from OOT sample</span>
+<span class="n">oot_final</span> <span class="o">&lt;-</span> <span class="n">oot</span> <span class="o">%&gt;%</span>
+  <span class="nf">select</span><span class="p">(</span><span class="n">id</span><span class="p">,</span> <span class="n">gb_flag</span><span class="p">,</span> <span class="n">age</span><span class="p">,</span> <span class="n">avg_deq_l3m</span><span class="p">,</span> <span class="n">pay_1_recode</span><span class="p">,</span> <span class="n">pay_4_recode</span><span class="p">,</span> <span class="n">pay_5_recode</span><span class="p">,</span> <span class="n">avg_util_l6m</span><span class="p">)</span>
+
+<span class="c1"># generate reports</span>
+<span class="c1"># good in the report is actually bad, whereas bad is actually good</span>
+<span class="nf">report</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="n">dt1</span> <span class="o">=</span> <span class="n">dev_final</span><span class="p">,</span> <span class="n">dt2</span> <span class="o">=</span> <span class="n">oot_final</span><span class="p">),</span> 
+       <span class="n">y</span> <span class="o">=</span> <span class="s">&#34;gb_flag&#34;</span><span class="p">,</span> 
+       <span class="n">x</span> <span class="o">=</span> <span class="n">var_select</span><span class="p">,</span> 
+       <span class="n">breaks_list</span> <span class="o">=</span> <span class="n">breaks_list</span><span class="p">,</span> 
+       <span class="n">seed</span> <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> 
+       <span class="n">basepoints_eq0</span> <span class="o">=</span> <span class="kc">TRUE</span><span class="p">,</span> 
+       <span class="n">method</span> <span class="o">=</span> <span class="s">&#34;freq&#34;</span><span class="p">,</span> 
+       <span class="n">positive</span> <span class="o">=</span> <span class="m">0</span><span class="p">,</span> 
+       <span class="n">points0</span> <span class="o">=</span> <span class="m">500</span><span class="p">,</span> 
+       <span class="n">odds0</span> <span class="o">=</span> <span class="m">100</span><span class="p">,</span>
+       <span class="n">pdo</span> <span class="o">=</span> <span class="m">-30</span><span class="p">)</span>
+</code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] sheet1-dataset information
+## [INFO] sheet2-model coefficients
+## [INFO] sheet3-model performance
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] sheet4-variable woe binning
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-2.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-3.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-4.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-5.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-6.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-7.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-8.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-9.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-10.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-11.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-12.png" width="672" /><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-13.png" width="672" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] sheet5-scorecard
+## [INFO] sheet6-population stability
+</code></pre></td></tr></table>
+</div>
+</div><p><img src="/post/2020-11-09-credit-scoring-development-using-r-part-3/index.en_files/figure-html/unnamed-chunk-5-14.png" width="672" /></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre class="chroma"><code class="language-fallback" data-lang="fallback">## [INFO] sheet7-gains table
+## [INFO] The report is saved as report_20201110_094457.xlsx
+</code></pre></td></tr></table>
+</div>
+</div><h2 id="80-conclusion">8.0 Conclusion</h2>
+<p>This post shows that a credit scorecard can be developed with ease in R using the package <code>scorecard</code>. The caveat is in the data set.  The data set used in this post is small and clean, therefore, does not need a lot of cleaning and manipulations. The number of new variables that can be generated from the data set is also not huge.</p>
+
+    </div>
+
+    
+<footer class="post-footer">
+      <div class="post-tags">
+          <a href="/tags/r/">R</a>
+          <a href="/tags/credit-scoring/">credit-scoring</a>
+          <a href="/tags/logistic-regression/">logistic-regression</a>
+          </div>
+      <nav class="post-nav">
+        
+        <a class="next" href="/post/2020-11-07-credit-scoring-development-using-r-part-2/">
+            <span class="next-text nav-default">Credit Scoring Development Using R - Part 2</span>
+            <span class="next-text nav-mobile">Next</span>
+            <i class="iconfont icon-right"></i>
+          </a>
+      </nav>
+    </footer>
+  </article>
+        </div>
+        
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="social-links">
+      <a href="mailto:ngyongkad@yahoo.com" class="iconfont icon-email" title="email"></a>
+      <a href="https://stackoverflow.com/" class="iconfont icon-stack-overflow" title="stack-overflow"></a>
+      <a href="https://twitter.com/" class="iconfont icon-twitter" title="twitter"></a>
+      <a href="https://www.linkedin.com/" class="iconfont icon-linkedin" title="linkedin"></a>
+      <a href="https://github.com/" class="iconfont icon-github" title="github"></a>
+  <a href="https://ngyongkad.netlify.app/index.xml" type="application/rss+xml" class="iconfont icon-rss" title="rss"></a>
+</div>
+
+<div class="copyright">
+  <span class="power-by">
+    Powered by <a class="hexo-link" href="https://gohugo.io">Hugo</a>
+  </span>
+  <span class="division">|</span>
+  <span class="theme-info">
+    Theme - 
+    <a class="theme-link" href="https://github.com/olOwOlo/hugo-theme-even">Even</a>
+  </span>
+
+  
+
+  <span class="copyright-year">
+    &copy; 
+    2020<span class="heart"><i class="iconfont icon-heart"></i></span><span>Ng Yong Kad</span>
+  </span>
+</div>
+
+    </footer>
+
+    <div class="back-to-top" id="back-to-top">
+      <i class="iconfont icon-up"></i>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.2.1/dist/jquery.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/slideout@1.0.1/dist/slideout.min.js" integrity="sha256-t+zJ/g8/KXIJMjSVQdnibt4dlaDxc9zXr/9oNPeWqdg=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.1.20/dist/jquery.fancybox.min.js" integrity="sha256-XVLffZaxoWfGUEbdzuLi7pwaUJv1cecsQJQqGLe7axY=" crossorigin="anonymous"></script>
+
+
+
+<script type="text/javascript" src="/js/main.min.c12618f9a600c40bd024996677e951e64d3487006775aeb22e200c990006c5c7.js"></script>
+
+
+
+
+
+
+
+
+</body>
+</html>

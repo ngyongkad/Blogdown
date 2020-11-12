@@ -1,0 +1,385 @@
+---
+title: Credit Scoring Development Using R - Part 1
+author: Ng Yong Kad
+date: '2020-11-06'
+slug: []
+categories:
+  - model-development
+tags:
+  - R
+  - credit-scoring
+lastmod: '2020-11-06T09:11:35+08:00'
+keywords: []
+description: ''
+comment: no
+toc: true
+autoCollapseToc: true
+postMetaInFooter: no
+hiddenFromHomePage: no
+contentCopyright: no
+reward: no
+mathjax: no
+mathjaxEnableSingleDollar: no
+mathjaxEnableAutoNumber: no
+hideHeaderAndFooter: no
+flowchartDiagrams:
+  enable: no
+  options: ''
+sequenceDiagrams:
+  enable: no
+  options: ''
+---
+
+
+This is the first of a 3-parts series. 
+
+This post aims at 2 groups of audience.  The first group has learned the underlying theories of credit scorecards but have yet seen a detailed application of the theories.  The second group is practitioners who are already well-versed with the theories and the applications, but would like to explore developing credit scorecards using a open-source software such as R.   
+
+
+## 1.0 Introduction
+
+
+The methodologies and processes of developing credit scorecards for lending purposes have been a long-held intellectual property of financial institutions and consulting firms.  
+
+Recently, even though several books have been published to shed lights on credit scorecards, practical guidance and demonstrations on the *hands-on* aspects of credit scorecards development have been in short supply.  This could be due to the following reasons:
+
+* Availability of data is a common hindrance. Due to regulations and customers’ privacy, financial institutions’ data cannot be shared with external parties. Even in the case of credit bureau, data is subject to strict data protection regulations and, thus, is not available for research purposes. As a result, it is not surprising that step-by-step demonstrations of credit scorecards development are absence from not only published books but also research papers (to the best of my knowledge); and
+
+* The software used to develop credit scorecards could be another obstacle. Different analysts, financial institutions and consulting firms use different softwares.  The codes of one software in general are not compatible with another softwares. Therefore, the selection of a particular software for demonstrating credit scorecards development will immediately reduce its appeals due to the lack of software compatibility.  On the other hand, using multiple softwares to demonstrate the development process will cause the scope to become unmanageable.  
+
+This post seeks to fill the gap by providing a practical hands-on demonstration on how to develop a credit scorecard, as close to reality as possible. To that end, 2 decisions are made to address the afore-mentioned challenges: A) a real, publicly available (albeit small) credit data set is used, and B) the open-source software R is adopted.  
+
+The choice of R is twofold:
+
+1. R is widely used among practitioners of data science and it is *free*. In addition, documentations on R is readily available and of good quality.  Since R is popular, using it will not reduce the appeal of the demonstrations shown in this post.  For non R users, R can be downloaded at no costs to run the R codes provided in this post.  
+
+2. A credit scorecards development "package", called `scorecard`, had been built in R by [Shichen Xie](https://cran.r-project.org/web/packages/scorecard/index.html). This wonderful package makes credit scorecards development a breeze and will be used throughout this post. 
+
+With the above, eager students can download R and the data set to learn credit scorecards development.  To analysts who are currently using different softwares for development efforts, this post can be taken as a show case on how an open-source software can be used reliably to built credit scorecards. Having a free alternative to consider and to explore is always an attractive business case.   
+
+Finally, it is noteworthy that this post **does not** seek to produce a powerful credit scorecard, given the rather small data set used and also to keep the length of this post manageable.  It is also assumed that the reader has minimal or no knowledge of R (comments are added in the codes to assist non R users).  Nonetheless, basic knowledge of credit scorecard theories is expected. 
+
+{{% admonition note "Note" true %}}
+Xie had prepared slides to show how a credit scorecard can be built using his package.  The slides, however, was written in Chinese and the data set used therein is not what an analyst will likely encounter in a real world situation.  
+{{% /admonition %}}
+
+
+## 2.0 R and Packages
+
+
+Other than the data set, which will be described in Section 3.0, the followings are needed for this post:
+
+1. Base R:  Base R can be downloaded from [CRAN](https://cran.r-project.org/);
+
+2. RStudio: This is the IDE for R and can be downloaded for *free* from [RStudio.com](https://www.rstudio.com/);
+
+3. Required R packages:  Install these packages via RStudio (select the option of install all dependencies during packages installation).
+
+   + scorecard - for credit scorecards development;
+   + tidyverse - for data import and manipulations;
+   + Hmisc - for summary statistics generation;
+   + ClusOfVar - for variables clustering. 
+
+A quick introduction on how to install the softwares and how to navigate RStudio can be found in Youtube video  [How to install R and install R Studio](https://www.youtube.com/watch?v=orjLGFmx6l4)
+
+
+## 3.0 Data
+
+
+This section describes the data set as well as the techniques used to process the data set. 
+
+A potential question that could be raised by the reader is on the data size R can handle.  This is a legitimate question as it is well known that R loads data onto memory (i.e. RAM), which could be an issue if the data size is very large.  There are at least 2 ways to overcome this:
+
+1. Pre-process the data as much as possible by using relational database software before loading into R.  R has “connector” that allows R to link to relational database server such as SQL.  Via connector, SQL commands can be submitted from R to the server for data manipulation purposes. Once in R, use `data.table` (instead of `data.frame`) to handle the data set; or
+
+2. Have access to cloud computing services such as AWS and Azure.  
+
+
+### 3.1 The Data Set 
+
+
+The data set analyzed in this post is sourced from Yeh, I. C., & Lien, C. H. (2009) and can be downloaded from [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/default+of+credit+card+clients). **DON'T download now**. The download will be done using R.
+
+The data set contains 30,000 credit card holders in Taiwan. What makes this data set interesting is that, in addition to the usual demographic information, payments, outstanding balances and delinquency status of the credit card holders were tracked over a period of time (6 months). This feature makes the data set similar to an analyst would encounter in a real credit scorecards development project. 
+
+In total, there are 24 variables in the data set. The columns (i.e. variables) of the data set were neatly labeled and, therefore, are largely self-explanatory.  Further remarks will be made in this post should need arise. Nonetheless, interested readers can find the information on the columns’ attributes on UCI Machine Learning Repository page. 
+
+{{% admonition note "Note" true %}}
+As the name of the default indicator *default in the next month* suggests, a credit scorecard built on this data set will be used to predict whether a credit card holder will default in next month. In banking industry, predicting default in the next 12 months is the norm.
+{{% /admonition %}}
+
+
+### 3.2 Import Data into R
+
+
+The data set from UCI Machine Learning Repository page has an extra row in row 1 of the spreadsheet.  It is crucial to delete this row from the spreadsheet.  The cleaned up version of the data set is stored at [Github](https://github.com/ngyongkad/scorecard/blob/main/Import%20Credit%20Card%20Defaults.csv?raw=true)   
+
+`library(tidyverse)` initiates the `tidyverse` package, which will be used for data processing and manipulation. `read.csv` loads the csv data set into R as an object called `data`. Examine carefully the first few rows of `data`, which is generated by running `head(data)`, to ensure that the data set is imported correctly.  `str(data)` gives a summary of the structure of the data set, which can be used in conjunction with `head(data)` for checking.    
+
+
+```r
+# load the tidyverse package. this only needs to be run only once
+library(tidyverse)  
+
+# download the file from Github. note the path uses forward slashes
+data <- read.csv("https://github.com/ngyongkad/scorecard/blob/main/Import%20Credit%20Card%20Defaults.csv?raw=true")  
+
+# print out the first few lines of the data set
+head(data) 
+
+# print out the structure of the data set
+str(data)  
+```
+
+```
+##   ID LIMIT_BAL SEX EDUCATION MARRIAGE AGE PAY_0 PAY_2 PAY_3 PAY_4 PAY_5 PAY_6
+## 1  1     20000   2         2        1  24     2     2    -1    -1    -2    -2
+## 2  2    120000   2         2        2  26    -1     2     0     0     0     2
+## 3  3     90000   2         2        2  34     0     0     0     0     0     0
+## 4  4     50000   2         2        1  37     0     0     0     0     0     0
+## 5  5     50000   1         2        1  57    -1     0    -1     0     0     0
+## 6  6     50000   1         1        2  37     0     0     0     0     0     0
+##   BILL_AMT1 BILL_AMT2 BILL_AMT3 BILL_AMT4 BILL_AMT5 BILL_AMT6 PAY_AMT1 PAY_AMT2
+## 1      3913      3102       689         0         0         0        0      689
+## 2      2682      1725      2682      3272      3455      3261        0     1000
+## 3     29239     14027     13559     14331     14948     15549     1518     1500
+## 4     46990     48233     49291     28314     28959     29547     2000     2019
+## 5      8617      5670     35835     20940     19146     19131     2000    36681
+## 6     64400     57069     57608     19394     19619     20024     2500     1815
+##   PAY_AMT3 PAY_AMT4 PAY_AMT5 PAY_AMT6 default.payment.next.month
+## 1        0        0        0        0                          1
+## 2     1000     1000        0     2000                          1
+## 3     1000     1000     1000     5000                          0
+## 4     1200     1100     1069     1000                          0
+## 5    10000     9000      689      679                          0
+## 6      657     1000     1000      800                          0
+## 'data.frame':	30000 obs. of  25 variables:
+##  $ ID                        : int  1 2 3 4 5 6 7 8 9 10 ...
+##  $ LIMIT_BAL                 : int  20000 120000 90000 50000 50000 50000 500000 100000 140000 20000 ...
+##  $ SEX                       : int  2 2 2 2 1 1 1 2 2 1 ...
+##  $ EDUCATION                 : int  2 2 2 2 2 1 1 2 3 3 ...
+##  $ MARRIAGE                  : int  1 2 2 1 1 2 2 2 1 2 ...
+##  $ AGE                       : int  24 26 34 37 57 37 29 23 28 35 ...
+##  $ PAY_0                     : int  2 -1 0 0 -1 0 0 0 0 -2 ...
+##  $ PAY_2                     : int  2 2 0 0 0 0 0 -1 0 -2 ...
+##  $ PAY_3                     : int  -1 0 0 0 -1 0 0 -1 2 -2 ...
+##  $ PAY_4                     : int  -1 0 0 0 0 0 0 0 0 -2 ...
+##  $ PAY_5                     : int  -2 0 0 0 0 0 0 0 0 -1 ...
+##  $ PAY_6                     : int  -2 2 0 0 0 0 0 -1 0 -1 ...
+##  $ BILL_AMT1                 : int  3913 2682 29239 46990 8617 64400 367965 11876 11285 0 ...
+##  $ BILL_AMT2                 : int  3102 1725 14027 48233 5670 57069 412023 380 14096 0 ...
+##  $ BILL_AMT3                 : int  689 2682 13559 49291 35835 57608 445007 601 12108 0 ...
+##  $ BILL_AMT4                 : int  0 3272 14331 28314 20940 19394 542653 221 12211 0 ...
+##  $ BILL_AMT5                 : int  0 3455 14948 28959 19146 19619 483003 -159 11793 13007 ...
+##  $ BILL_AMT6                 : int  0 3261 15549 29547 19131 20024 473944 567 3719 13912 ...
+##  $ PAY_AMT1                  : int  0 0 1518 2000 2000 2500 55000 380 3329 0 ...
+##  $ PAY_AMT2                  : int  689 1000 1500 2019 36681 1815 40000 601 0 0 ...
+##  $ PAY_AMT3                  : int  0 1000 1000 1200 10000 657 38000 0 432 0 ...
+##  $ PAY_AMT4                  : int  0 1000 1000 1100 9000 1000 20239 581 1000 13007 ...
+##  $ PAY_AMT5                  : int  0 0 1000 1069 689 1000 13750 1687 1000 1122 ...
+##  $ PAY_AMT6                  : int  0 2000 5000 1000 679 800 13770 1542 1000 0 ...
+##  $ default.payment.next.month: int  1 1 0 0 0 0 0 0 0 0 ...
+```
+
+
+### 3.2 Data Exploration
+
+
+Once the data set is imported correctly, it is always good to generate summary statistics to understand the data.  This can be done using the package `Hmisc` as below.  `describe(data)` gives very detailed descriptive statistics on all of the variables in the data set. This report should be reviewed thoroughly to detect unusual values or anything that is out of expectations.  
+
+
+```r
+library(Hmisc)
+describe(data)
+```
+
+
+```
+## data 
+## 
+##  3  Variables      30000  Observations
+## --------------------------------------------------------------------------------
+## PAY_0 
+##        n  missing distinct     Info     Mean      Gmd      .05      .10 
+##    30000        0       11    0.871  -0.0167    1.159       -2       -1 
+##      .25      .50      .75      .90      .95 
+##       -1        0        0        2        2 
+## 
+## lowest : -2 -1  0  1  2, highest:  4  5  6  7  8
+##                                                                             
+## Value         -2    -1     0     1     2     3     4     5     6     7     8
+## Frequency   2759  5686 14737  3688  2667   322    76    26    11     9    19
+## Proportion 0.092 0.190 0.491 0.123 0.089 0.011 0.003 0.001 0.000 0.000 0.001
+## --------------------------------------------------------------------------------
+## PAY_2 
+##        n  missing distinct     Info     Mean      Gmd      .05      .10 
+##    30000        0       11    0.843  -0.1338    1.214       -2       -2 
+##      .25      .50      .75      .90      .95 
+##       -1        0        0        2        2 
+## 
+## lowest : -2 -1  0  1  2, highest:  4  5  6  7  8
+##                                                                             
+## Value         -2    -1     0     1     2     3     4     5     6     7     8
+## Frequency   3782  6050 15730    28  3927   326    99    25    12    20     1
+## Proportion 0.126 0.202 0.524 0.001 0.131 0.011 0.003 0.001 0.000 0.001 0.000
+## --------------------------------------------------------------------------------
+## PAY_3 
+##        n  missing distinct     Info     Mean      Gmd      .05      .10 
+##    30000        0       11    0.843  -0.1662    1.209       -2       -2 
+##      .25      .50      .75      .90      .95 
+##       -1        0        0        2        2 
+## 
+## lowest : -2 -1  0  1  2, highest:  4  5  6  7  8
+##                                                                             
+## Value         -2    -1     0     1     2     3     4     5     6     7     8
+## Frequency   4085  5938 15764     4  3819   240    76    21    23    27     3
+## Proportion 0.136 0.198 0.525 0.000 0.127 0.008 0.003 0.001 0.001 0.001 0.000
+## --------------------------------------------------------------------------------
+```
+
+From the report above (due to the large number of outputs, only a few variables are shown), 2 observations are worth noting:
+
+1. All variables have no missing values, which is rare in a real world situation. In practice, missing values always warrant attentions and investigations. This is because the existence of missing values could be due to some underlying business processes rather than due to no information captured.  Variables with excessive real missing values should be discarded (the benchmark is more than 50% values missing.)
+
+2. The “PAY_x” variables represent delinquency status.  The first delinquency variable is “PAY_0” and follows by “PAY_2”. In other words, “PAY_1” is omitted. In addition, for the delinquency status variables in this data set, “-1” signifies a particular customer was current on the payment.  However, from the report generated using R, it can be observed that the delinquency status variables contain values “0” and “-2”, which are out of expectations.
+
+Point 2 will be addressed in the section below.  
+
+
+### 3.3 Data Manipulation and Variables Generation
+
+#### 3.3.1 Manipulations
+
+
+There are a few things need to be achieved in this section. First, rename all variables to lower case for easier codes typing.  Second, rename "pay_0" to "pay_1".  Third, rename the default indicator "default payment next month" with a shorter name "gb_flag", where "gb" indicates good bad.  Fourth, in all the "pay_x" variables, recode the values "-2" and "-1" into "0". "0" signifies current on payment. Finally, a cross-tab is run to check the recoding is done correctly.  
+
+
+```r
+data <- data %>%
+  # rename the variables to lower case
+  rename_with(str_to_lower, everything()) %>%
+  # rename "pay_0" to "pay_1" and "default payment next month" to "gb_flag"
+  rename("pay_1" = "pay_0", "gb_flag" = "default.payment.next.month")
+
+# set up a function to recode delinquency status
+new_deq <- function(x) {
+  ifelse(x %in% c(-2, -1), 0, x)
+}
+# recode delinquency status
+data <- data %>% 
+ mutate(across(pay_1:pay_6, new_deq, .names = "{col}_recode"))
+
+# quick check on the recoding
+table(data$pay_1, data$pay_1_recode)
+```
+
+```
+##     
+##          0     1     2     3     4     5     6     7     8
+##   -2  2759     0     0     0     0     0     0     0     0
+##   -1  5686     0     0     0     0     0     0     0     0
+##   0  14737     0     0     0     0     0     0     0     0
+##   1      0  3688     0     0     0     0     0     0     0
+##   2      0     0  2667     0     0     0     0     0     0
+##   3      0     0     0   322     0     0     0     0     0
+##   4      0     0     0     0    76     0     0     0     0
+##   5      0     0     0     0     0    26     0     0     0
+##   6      0     0     0     0     0     0    11     0     0
+##   7      0     0     0     0     0     0     0     9     0
+##   8      0     0     0     0     0     0     0     0    19
+```
+
+
+#### 3.3.2 Variables Generation
+
+ 
+Except for some specific variables such as demographic information, raw variables in a data set are normally not used directly in credit scorecards.  In this post, new variables are created from delinquency status, limit, and outstanding balance. To keep the scope simple, no new variables will be generated from payment amount. But by using the ideas and codes provided below, the reader should have no problem of creating his/her own variables from payment amount. Variables generation is only limited by imagination or creativity. Given the same data set, different analysts could generate different variables.  
+
+
+```r
+## Delinquency status
+
+# un-needed "pay_x" variables are removed 
+var_data <- data %>%
+  select(-(pay_1:pay_6))
+
+# identify the position of the variables
+deq_pos_l3m <- which(str_detect(names(var_data), "pay_(1|2|3)_recode"))
+deq_pos_l6m <- which(str_detect(names(var_data), "pay_(1|2|3|4|5|6)_recode"))
+
+# generate new variables
+var_data <- var_data %>%
+  mutate(
+  # average delinquency
+  avg_deq_l3m = apply(var_data[, deq_pos_l3m], 1, mean, na.rm = TRUE),
+  avg_deq_l6m = apply(var_data[, deq_pos_l6m], 1, mean, na.rm = TRUE),
+   
+  # max delinquency
+  max_deq_l3m = apply(var_data[, deq_pos_l3m], 1, max, na.rm = TRUE),
+  max_deq_l6m = apply(var_data[, deq_pos_l6m], 1, max, na.rm = TRUE),
+  
+  # min delinquency
+  min_deq_l3m = apply(var_data[, deq_pos_l3m], 1, min, na.rm = TRUE),
+  min_deq_l6m = apply(var_data[, deq_pos_l6m], 1, min, na.rm = TRUE)
+  )
+```
+
+
+```r
+## utilization rate
+
+# set up a function to compute utilization rate
+uti_rate <- function(x) {
+  ifelse(x < 0, 0, x / var_data$limit_bal)
+}
+
+# compute utilization rate
+var_data <- var_data %>% 
+  mutate(across(contains("bill_amt"), .fns = list(util = uti_rate)))
+
+# identify the position of the variables
+util_pos_l3m <- which(str_detect(names(var_data), "bill_amt(1|2|3)_util"))
+util_pos_l6m <- which(str_detect(names(var_data), "bill_amt(1|2|3|4|5|6)_util"))
+
+# generate new variables
+var_data <- var_data %>% 
+  mutate(
+  # average utilization
+  avg_util_l3m = apply(var_data[, util_pos_l3m], 1, mean, na.rm = TRUE),
+  avg_util_l6m = apply(var_data[, util_pos_l6m], 1, mean, na.rm = TRUE),
+  
+  # max utilization
+  max_util_l3m = apply(var_data[, util_pos_l3m], 1, max, na.rm = TRUE),
+  max_util_l6m = apply(var_data[, util_pos_l6m], 1, max, na.rm = TRUE),
+  
+  # min utilization
+  min_util_l3m = apply(var_data[, util_pos_l3m], 1, min, na.rm = TRUE),
+  min_util_l6m = apply(var_data[, util_pos_l6m], 1, min, na.rm = TRUE)
+  )
+```
+
+
+#### 3.3.3 Sampling
+
+
+Having generated the new variables, the full data set can now be divided into a development/training sample and a validation sample. 
+
+In a real credit scorecard development project, a validation sample is an out-of-time (OOT) sample, which is required to be taken from a different time period as compared to that of the development sample. In this data set, however, splitting the full data set in the way prescribed above is not possible.  Instead, 80% of the full population is randomly selected as the development sample, and the remaining 20% is the validation sample. 
+
+
+```r
+# set the seed for the random sample
+set.seed(1234) 
+
+# randomly select from the id column
+dev_ind <- sample(var_data$id, 24000, replace = FALSE) 
+
+# use randomly selected ids to form the development sample  
+dev <- var_data[dev_ind,] 
+
+# use non-selected ids to forms the validation sample
+oot <- var_data[-dev_ind,] 
+```
+
+
+
