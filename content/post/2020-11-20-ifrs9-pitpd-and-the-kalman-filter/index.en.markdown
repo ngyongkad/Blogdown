@@ -77,10 +77,10 @@ Due to the lack of long real GDP series in Malaysia (at the same constant prices
 The annual nominal GDP growth rate is observable. However, it may not reflect the true state of the economy. The true state of an economy is not directly observable. 
 
 Let $ \displaystyle y_{t} $ be a variable that is directly observable and $ \displaystyle x_{t} $ be a variable that is not directly observable. $ \displaystyle x_{t} $ is called a state variable. To link these 2 variables together, a model in the state-space form can be written as:
- \begin{array}{l}
-y_{t} \ =\ Ax_{t} + \ v_{t}\\
-x_{t} =\Phi x_{t-1} +\ w_{t} 
-\end{array}`
+ 
+$$ y_{t} \ =\ Ax_{t} + \ v_{t}\\ $$
+$$ x_{t} =\Phi x_{t-1} +\ w_{t}  $$
+
 
 where
 $ \displaystyle w_{t} \sim \ N( 0,\ Q) $ and $ \displaystyle v_{t} \sim \ N( 0,\ R) $.  
