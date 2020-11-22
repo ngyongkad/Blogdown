@@ -11,7 +11,7 @@ tags:
 lastmod: '2020-11-07T15:38:40+08:00'
 keywords: []
 description: ''
-comment: no
+comment: TRUE
 toc: TRUE
 autoCollapseToc: TRUE
 postMetaInFooter: no

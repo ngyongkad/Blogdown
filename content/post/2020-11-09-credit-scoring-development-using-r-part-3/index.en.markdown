@@ -12,7 +12,7 @@ tags:
 lastmod: '2020-11-09T08:48:31+08:00'
 keywords: []
 description: ''
-comment: no
+comment: TRUE
 toc: TRUE
 autoCollapseToc: TRUE
 postMetaInFooter: no
@@ -327,7 +327,7 @@ report(list(dt1 = dev_final, dt2 = oot_final),
 
 ```
 ## [INFO] sheet7-gains table
-## [INFO] The report is saved as report_20201110_094457.xlsx
+## [INFO] The report is saved as report_20201122_094355.xlsx
 ```
 
 
