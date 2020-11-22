@@ -138,7 +138,7 @@ copyright = ""            # default: author.name
 
   [params.utterances]       # https://utteranc.es/
     owner = "ngyongkad"              # Your GitHub ID
-    repo = "ngyongkad/blogdown"               # The repo to store comments
+    repo = "blogdown"               # The repo to store comments
 
   [params.gitalk]           # Gitalk is a comment system based on GitHub issues. see https://github.com/gitalk/gitalk
     owner = ""              # Your GitHub ID
