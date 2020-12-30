@@ -18,7 +18,9 @@ I am keen on data analytics and the technologies used to conduct it. I heard abo
 * R is not only **free** but also very powerful. In addition, many R packages that incorporated with cutting-edge methodologies are developed and/or maintained by top-notch researchers and developers. 
 * Documentations on R is widely available and, again, for **free**. This includes the resources and materials I used to develop this site.  
 
-Finally, I have more than a decade of working experience in credit risk analytics.  I reside in Malaysia.  
+Finally, I have more than a decade of working experience in credit risk analytics.  I reside in Malaysia. If you find the materials and information on this page useful, do consider to buy me a coffee. :)
+
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="ngyongkad" data-color="#BD5FFF" data-emoji="" data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#ffffff" data-coffee-color="#FFDD00" ></script>
 
 
 
