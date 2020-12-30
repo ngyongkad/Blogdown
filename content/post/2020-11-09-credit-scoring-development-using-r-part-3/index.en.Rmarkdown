@@ -162,4 +162,4 @@ report(list(dt1 = dev_final, dt2 = oot_final),
 This post shows that a credit scorecard can be developed with ease in R using the package `scorecard`. The caveat is in the data set.  The data set used in this post is small and clean, therefore, does not need a lot of cleaning and manipulations. The number of new variables that can be generated from the data set is also not huge.  
 
 
- 
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="ngyongkad" data-description="Support me on Buy me a coffee!" data-message="If you find the materials and information useful, do consider buying me a coffee. :)" data-color="#F471FF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>

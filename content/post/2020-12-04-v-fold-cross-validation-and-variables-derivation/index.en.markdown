@@ -240,3 +240,6 @@ test_iv_summary %>%
 
 
 The analysis shows that the usual time periods used for variables derivations can be sub-optimal. The approach shown here essentially treats time period as a *tuning parameter* and use v-fold cross validation to determine the optimal parameter. In addition, v-fold cross validation eliminates any doubts on over-fitting and avoid data leakage. With some modifications, the approach can be applied in a wide range of applications.
+
+
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="ngyongkad" data-description="Support me on Buy me a coffee!" data-message="If you find the materials and information useful, do consider buying me a coffee. :)" data-color="#F471FF" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
