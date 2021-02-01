@@ -45,3 +45,6 @@ It is an elegant equation and bears some resemblance to Bayes' theorem. The ques
 I took up the challenge and showed that while the form of the equation's looks like it is from Bayes' theorem, the equation in fact is not based on the theorem. Please refer to the [post](https://quant.stackexchange.com/questions/50386/pd-calibration-using-bayes-formula/60839#60839) for the full derivations.
 
 Finally, it would be interesting if simulations can be conducted to see if the approach is sound. 
+
+
+<script data-name="BMC-Widget" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js" data-id="ngyongkad" data-description="Support me on Buy me a coffee!" data-message="If you find the materials and information useful, do consider buying me a coffee. :)" data-color="#F471FF" data-position="Right" data-x_margin="18" data-y_margin="18"></script> 
