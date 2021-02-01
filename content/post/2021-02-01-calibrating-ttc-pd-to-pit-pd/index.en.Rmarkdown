@@ -1,0 +1,47 @@
+---
+title: Calibrating TTC PD to PiT PD
+author: Ng Yong Kad
+date: '2021-02-01'
+slug: []
+categories:
+  - IFRS9
+  - Basel
+tags:
+  - PiT-PD
+  - TTC-PD
+lastmod: '2021-02-01T08:45:20+08:00'
+keywords: []
+description: ''
+comment: TRUE
+toc: no
+autoCollapseToc: no
+postMetaInFooter: no
+hiddenFromHomePage: no
+contentCopyright: no
+reward: no
+mathjax: TRUE
+mathjaxEnableSingleDollar: TRUE
+mathjaxEnableAutoNumber: TRUE
+hideHeaderAndFooter: no
+flowchartDiagrams:
+  enable: no
+  options: ''
+sequenceDiagrams:
+  enable: no
+  options: ''
+---
+
+In one of my previous posts, it was shown that how one can obtain PiT PD from TTC PD using the Kalman filter. I came across an interesting alternative approach on Quantitative Finance. In particular, assuming that TTC PD estimates are already available at the portfolio level and rating levels, a forecast of the portfolio level PiT PD is all that required by the approach.
+
+More concretely, under the approach, the PiT PD for rating *i* is given by the following equation:
+
+
+$$ \begin{equation*}
+PiT\ PD_{i}\ = \left[\frac{( PD_{PIT}) \ (1-PD_{TTC} )\ PD^{i}_{TTC}}{( 1-PD_{PIT}) \ ( PD_{TTC}) \ \left( 1-PD^{i}_{TTC}\right) +( PD_{PIT}) \ (1-PD_{TTC} )\ PD^{i}_{TTC}}\right]
+\end{equation*} $$
+
+It is an elegant equation and bears some resemblance to Bayes' theorem. The question posted on Quantitative Finance was how the equation was derived by using Bayes' theorem and the reasoning behind it. 
+
+I took up the challenge and showed that while the form of the equation's looks like it is from Bayes' theorem, the equation in fact is not based on the theorem. Please refer to the [post](https://quant.stackexchange.com/questions/50386/pd-calibration-using-bayes-formula/60839#60839) for the full derivations.
+
+Finally, it would be interesting if simulations can be conducted to see if the approach is sound. 
